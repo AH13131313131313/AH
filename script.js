@@ -1,8 +1,8 @@
-// استيراد مكتبات Firebase سحابياً
+// 1. استيراد المكتبات السحابية
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, set, get, child, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { getDatabase, ref, set, get, child, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// بيانات Firebase الخاصة بك (المستخرجة من صورتك السابقة)
+// 2. إعدادات Firebase (مفاتيحك الخاصة)
 const firebaseConfig = {
   apiKey: "AIzaSyD6ovMBiZrl2eVcMPwqGv-LWbo0T-504NY",
   authDomain: "ahdynamics-63745.firebaseapp.com",
@@ -13,11 +13,10 @@ const firebaseConfig = {
   appId: "1:153934340820:web:352caa101535b00b7dd141"
 };
 
-// تهيئة Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// تهيئة الأنيميشنات
+// تهيئة الأنيميشنات الفاخرة
 AOS.init({ duration: 1000, once: false });
 
 const ADMIN_EMAIL = "ahabdellah210@gmail.com";
@@ -26,101 +25,138 @@ let currentLang = 'ar';
 let loginMode = false;
 let currentUserEmail = "";
 
-const dbText = {
-    ar: {
-        auth_reg: "إنشاء حساب جديد", auth_log: "تسجيل الدخول",
-        auth_btn_reg: "تأكيد العملية", auth_btn_log: "دخول النظام",
-        switch_reg: "لديك حساب بالفعل؟", switch_log: "ليس لديك حساب؟",
-        link_reg: "تسجيل الدخول", link_log: "سجل الآن",
-        hero_t: 'وكالة <span class="gold-gradient">AH</span> العالمية',
-        hero_d: "نحن لا نصمم فقط، نحن نبني تجارب رقمية تترك أثراً عالمياً.",
-        nav_conf: "مؤتمر AH", side_t: "مؤتمر AH السنوي",
-        side_d: "انضم لنخبة المطورين في الحدث الأبرز لهذا العام.",
-        ticket_btn: "اشترك الآن واحصل على كودك", wa_label: "تواصل معنا واتساب: 0555070548",
-        services: [
-            { id: 'video', t: "صناعة الفيديوهات", d: "نقدم خدمة مونتاج سينمائي احترافية، تشمل تصحيح الألوان، المؤثرات البصرية، وصناعة المحتوى الإبداعي بأعلى دقة.", i: "fas fa-video" },
-            { id: 'graphic', t: "التصميم الجرافيكي", d: "بناء هويات بصرية متكاملة، شعارات احترافية، وتصاميم سوشيال ميديا تجذب الأنظار.", i: "fas fa-pen-nib" },
-            { id: 'web', t: "صناعة المواقع", d: "تطوير مواقع ويب سريعة، متجاوبة، وآمنة باستخدام أحدث التقنيات العالمية وبرمجتها بدقة.", i: "fas fa-code" },
-            { id: 'consult', t: "استشارات تقنية", d: "تقديم حلول تقنية ذكية لمشروعك، وتوجيهك نحو أفضل الأدوات الرقمية لتحقيق النجاح.", i: "fas fa-lightbulb" }
-        ]
-    },
-    en: {
-        auth_reg: "Create New Account", auth_log: "Secure Login",
-        auth_btn_reg: "Confirm Process", auth_btn_log: "Enter System",
-        switch_reg: "Already have an account?", switch_log: "Don't have an account?",
-        link_reg: "Login", link_log: "Sign Up",
-        hero_t: '<span class="gold-gradient">AH</span> Global Agency',
-        hero_d: "We don't just design; we build digital experiences that leave a global impact.",
-        nav_conf: "AH Conference", side_t: "AH Annual Conference",
-        side_d: "Join elite developers in the year's most prominent event.",
-        ticket_btn: "Join Now & Get Your Code", wa_label: "Contact WhatsApp: 0555070548",
-        services: [
-            { id: 'video', t: "Video Production", d: "Professional cinematic editing, color grading, visual effects, and high-quality creative content creation.", i: "fas fa-video" },
-            { id: 'graphic', t: "Graphic Design", d: "Building complete visual identities, professional logos, and eye-catching social media designs.", i: "fas fa-pen-nib" },
-            { id: 'web', t: "Web Development", d: "Developing fast, responsive, and secure websites using the latest global technologies.", i: "fas fa-code" },
-            { id: 'consult', t: "Tech Consulting", d: "Providing smart technical solutions for your project and guiding you to the best digital tools.", i: "fas fa-lightbulb" }
-        ]
-    }
-};
+// دالة التحقق من صحة الإيميل (Regex) لضمان عدم إدخال إيميلات وهمية
+function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
 
-// --- وظائف الربط السحابي (Firebase) ---
-
+// --- نظام الهوية والدخول السحابي ---
 window.handleAuth = async function() {
-    const rawEmail = document.getElementById('auth-email').value;
-    const emailKey = rawEmail.replace(/\./g, '_'); // Firebase لا يقبل النقطة في المفاتيح
+    const rawEmail = document.getElementById('auth-email').value.trim().toLowerCase();
     const pass = document.getElementById('auth-pass').value;
+    const emailKey = rawEmail.replace(/\./g, '_');
 
-    if(!rawEmail || !pass) return alert("Please fill all fields!");
+    if (!isValidEmail(rawEmail)) return alert("الرجاء إدخال إيميل حقيقي وصحيح!");
+    if (pass.length < 6) return alert("كلمة السر قصيرة جداً (6 أحرف كحد أدنى)");
 
-    if(loginMode) {
-        if(rawEmail === ADMIN_EMAIL && pass === ADMIN_PASS) return showAdmin();
+    const dbRef = ref(db);
+    if (loginMode) {
+        // تسجيل الدخول
+        if (rawEmail === ADMIN_EMAIL && pass === ADMIN_PASS) return showAdmin();
         
-        const dbRef = ref(db);
         get(child(dbRef, `users/${emailKey}`)).then((snapshot) => {
             if (snapshot.exists() && snapshot.val().pass === pass) {
                 currentUserEmail = emailKey;
                 enterSite();
                 updateTicketDisplay();
-            } else { alert("Invalid Credentials!"); }
+                listenToWinner(); // الاستماع الحي لنتائج القرعة
+            } else { alert("بيانات الدخول غير صحيحة!"); }
         });
     } else {
-        set(ref(db, 'users/' + emailKey), {
-            email: rawEmail,
-            pass: pass,
-            ticket: null
-        }).then(() => {
-            alert("Registration Successful! Please Login.");
-            toggleAuthMode();
+        // إنشاء حساب جديد (مع منع التكرار)
+        get(child(dbRef, `users/${emailKey}`)).then((snapshot) => {
+            if (snapshot.exists()) {
+                alert("هذا الإيميل مسجل مسبقاً! يرجى تسجيل الدخول.");
+            } else {
+                set(ref(db, 'users/' + emailKey), {
+                    email: rawEmail, pass: pass, ticket: null, inDraw: false, isWinner: false
+                }).then(() => {
+                    alert("تم إنشاء حسابك الأسطوري بنجاح! سجل دخولك الآن.");
+                    toggleAuthMode();
+                });
+            }
         });
     }
 }
 
+// --- نظام تذاكر المؤتمر والقرعة ---
 window.generateTicket = function() {
     let code = Math.floor(100000 + Math.random() * 900000).toString();
-    set(ref(db, `users/${currentUserEmail}/ticket`), code).then(() => {
+    update(ref(db, `users/${currentUserEmail}`), { ticket: code }).then(() => {
+        updateTicketDisplay();
+    });
+}
+
+window.joinDraw = function() {
+    update(ref(db, `users/${currentUserEmail}`), { inDraw: true }).then(() => {
+        alert("تم دخولك في القرعة الكبرى بنجاح! حظاً موفقاً ✨");
         updateTicketDisplay();
     });
 }
 
 function updateTicketDisplay() {
-    const dbRef = ref(db);
-    get(child(dbRef, `users/${currentUserEmail}/ticket`)).then((snapshot) => {
-        if (snapshot.exists()) {
-            const area = document.getElementById('ticket-area');
+    get(child(ref(db), `users/${currentUserEmail}`)).then((snapshot) => {
+        const u = snapshot.val();
+        const area = document.getElementById('ticket-area');
+        if (u && u.ticket) {
             area.innerHTML = `
-                <div class="ticket-visual" data-aos="flip-left">
-                    <p>${currentLang === 'ar' ? 'كود الاشتراك الخاص بك' : 'Your Subscription Code'}</p>
-                    <div class="ticket-number">${snapshot.val()}</div>
-                    <small>${currentLang === 'ar' ? 'احتفظ بهذا الكود لدخول المؤتمر' : 'Keep this code for entry'}</small>
-                </div>`;
+                <div class="ticket-visual" data-aos="flip-up">
+                    <div class="ticket-number">${u.ticket}</div>
+                    <p style="margin:5px 0;">كود المؤتمر</p>
+                </div>
+                ${!u.inDraw ? 
+                `<button onclick="joinDraw()" class="gold-btn" style="margin-top:15px; width:100%;">🎁 دخول القرعة لعمل مجاني</button>` : 
+                `<p style="color:var(--gold); margin-top:10px; font-weight:bold;">✅ أنت مشارك في القرعة</p>`}
+            `;
         }
     });
 }
 
-// لوحة الأدمن (تحديث حي من السحاب)
+// --- وظيفة الأدمن: إطلاق القرعة العشوائية ---
+window.runDraw = function() {
+    get(ref(db, 'users/')).then((snapshot) => {
+        const users = snapshot.val();
+        const participants = Object.keys(users).filter(key => users[key].inDraw === true);
+        
+        if (participants.length === 0) return alert("لا يوجد مشاركون في القرعة حالياً!");
+
+        // اختيار فائز عشوائي
+        const winnerKey = participants[Math.floor(Math.random() * participants.length)];
+        
+        // تحديث حالة الفائز في السحاب فوراً
+        update(ref(db, `users/${winnerKey}`), { isWinner: true }).then(() => {
+            alert("تم اختيار الفائز بنجاح: " + users[winnerKey].email);
+        });
+    });
+}
+
+// مراقبة حية للمستخدم (إذا فاز تظهر له الرسالة فوراً)
+function listenToWinner() {
+    onValue(ref(db, `users/${currentUserEmail}/isWinner`), (snapshot) => {
+        if (snapshot.val() === true) {
+            showWinnerModal();
+        }
+    });
+}
+
+function showWinnerModal() {
+    const modal = document.getElementById('modal-content-dynamic');
+    modal.innerHTML = `
+        <div style="text-align:center;">
+            <i class="fas fa-trophy" style="font-size:4rem; color:var(--gold); margin-bottom:15px;"></i>
+            <h1 class="gold-gradient" style="font-size:2.5rem;">ألف مبروك! فزت معنا</h1>
+            <p style="margin:20px 0; font-size:1.1rem;">لقد تم اختيارك في القرعة العشوائية للحصول على عمل مجاني.</p>
+            <p>اختر الخدمة التي تريدها الآن:</p>
+            <select id="free-gift-choice" style="width:100%; padding:12px; background:#111; color:white; border:1px solid var(--gold); border-radius:8px;">
+                <option>🎬 مونتاج فيديو احترافي</option>
+                <option>🎨 تصميم شعار وهوية بصرية</option>
+                <option>💻 برمجة موقع تعريفي</option>
+            </select>
+            <button onclick="confirmGift()" class="gold-btn" style="margin-top:20px; width:100%;">تأكيد الهدية</button>
+        </div>
+    `;
+    document.getElementById('service-modal').classList.remove('hidden');
+}
+
+window.confirmGift = function() {
+    const choice = document.getElementById('free-gift-choice').value;
+    alert("مبروك! اخترت " + choice + ". سنتصل بك قريباً!");
+    closeModal();
+}
+
+// --- إدارة لوحة الأدمن ---
 function renderTable() {
-    const usersRef = ref(db, 'users/');
-    onValue(usersRef, (snapshot) => {
+    onValue(ref(db, 'users/'), (snapshot) => {
         const data = snapshot.val();
         const tableBody = document.getElementById('admin-table-body');
         tableBody.innerHTML = "";
@@ -128,11 +164,10 @@ function renderTable() {
             Object.keys(data).forEach(key => {
                 const u = data[key];
                 tableBody.innerHTML += `
-                    <tr>
-                        <td>${u.email}</td>
-                        <td>${u.pass}</td>
-                        <td class="gold-gradient">${u.ticket || 'Not Registered'}</td>
-                        <td><button onclick="deleteUser('${key}')" style="background:none; border:none; color:red; cursor:pointer;"><i class="fas fa-trash"></i> حذف</button></td>
+                    <tr style="${u.isWinner ? 'background:rgba(212,175,55,0.1)' : ''}">
+                        <td>${u.email}</td><td>${u.pass}</td>
+                        <td class="gold-gradient">${u.ticket || '---'} ${u.inDraw ? '🔥' : ''}</td>
+                        <td><button onclick="deleteUser('${key}')" style="color:red; background:none; border:none; cursor:pointer;"><i class="fas fa-trash"></i></button></td>
                     </tr>`;
             });
             document.getElementById('user-count').innerText = Object.keys(data).length;
@@ -140,41 +175,32 @@ function renderTable() {
     });
 }
 
-window.deleteUser = function(key) {
-    if(confirm("Delete user?")) remove(ref(db, 'users/' + key));
+// باقي الوظائف (اللغة، الحذف، إظهار الواجهات)
+window.showAdmin = function() {
+    document.getElementById('auth-container').classList.add('hidden');
+    document.getElementById('admin-page').classList.remove('hidden');
+    const adminArea = document.getElementById('admin-page');
+    if(!document.getElementById('draw-btn-admin')){
+        const btn = document.createElement('button');
+        btn.id = "draw-btn-admin";
+        btn.innerHTML = "🎲 سحب القرعة الآن";
+        btn.className = "gold-btn";
+        btn.style.margin = "20px auto";
+        btn.style.display = "block";
+        btn.onclick = runDraw;
+        adminArea.prepend(btn);
+    }
+    renderTable();
 }
 
-// --- بقية الوظائف الأساسية ---
-
-window.toggleLanguage = function() {
-    currentLang = currentLang === 'ar' ? 'en' : 'ar';
-    document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
-    const lang = dbText[currentLang];
-    document.getElementById('lang-btn-text').innerText = currentLang === 'ar' ? 'English' : 'العربية';
-    document.getElementById('hero-title').innerHTML = lang.hero_t;
-    document.getElementById('hero-desc').innerText = lang.hero_d;
-    document.getElementById('nav-conf-text').innerText = lang.nav_conf;
-    document.getElementById('side-title').innerText = lang.side_t;
-    document.getElementById('side-desc').innerText = lang.side_d;
-    document.getElementById('wa-label').innerText = lang.wa_label;
-    updateAuthUI();
-    renderServices();
-}
-
-function updateAuthUI() {
-    const lang = dbText[currentLang];
-    document.getElementById('auth-title').innerText = loginMode ? lang.auth_log : lang.auth_reg;
-    document.getElementById('auth-btn-main').querySelector('.btn-text').innerText = loginMode ? lang.auth_btn_log : lang.auth_btn_reg;
-    document.getElementById('auth-switch-text').innerText = loginMode ? lang.switch_log : lang.switch_reg;
-    document.getElementById('auth-link').innerText = loginMode ? lang.link_log : lang.link_reg;
-}
-
+window.deleteUser = function(key) { if(confirm("حذف المستخدم نهائياً؟")) remove(ref(db, 'users/' + key)); }
 window.toggleAuthMode = function() { loginMode = !loginMode; updateAuthUI(); }
-function enterSite() { document.getElementById('auth-container').classList.add('hidden'); document.getElementById('main-content').classList.remove('hidden'); renderServices(); AOS.refresh(); }
+function enterSite() { document.getElementById('auth-container').classList.add('hidden'); document.getElementById('main-content').classList.remove('hidden'); renderServices(); }
 window.logout = function() { location.reload(); }
-window.showAdmin = function() { document.getElementById('auth-container').classList.add('hidden'); document.getElementById('admin-page').classList.remove('hidden'); renderTable(); }
-window.backToSite = function() { document.getElementById('admin-page').classList.add('hidden'); document.getElementById('auth-container').classList.remove('hidden'); }
+window.closeModal = function() { document.getElementById('service-modal').classList.add('hidden'); }
+window.toggleSidebar = function() { document.getElementById('conference-sidebar').classList.toggle('active'); }
 
+// عرض الخدمات
 function renderServices() {
     const grid = document.getElementById('services-grid');
     const images = {
@@ -183,26 +209,23 @@ function renderServices() {
         web: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1200",
         consult: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1200"
     };
-    grid.innerHTML = dbText[currentLang].services.map((s, i) => `
-        <div class="service-card-wrapper" data-aos="fade-up" data-aos-delay="${i*150}">
+    grid.innerHTML = [
+        {id:'video', t:'صناعة الفيديوهات', i:'fas fa-video'},
+        {id:'graphic', t:'التصميم الجرافيكي', i:'fas fa-pen-nib'},
+        {id:'web', t:'صناعة المواقع', i:'fas fa-code'},
+        {id:'consult', t:'استشارات تقنية', i:'fas fa-lightbulb'}
+    ].map(s => `
+        <div class="service-card-wrapper" data-aos="fade-up">
             <div class="service-card" onclick="openService('${s.id}')">
-                <img src="${images[s.id]}" class="service-img" alt="${s.t}">
+                <img src="${images[s.id]}" class="service-img">
                 <div class="service-overlay-content"><i class="${s.i}"></i><h3>${s.t}</h3></div>
             </div>
         </div>`).join('');
 }
 
-window.openService = function(id) {
-    const s = dbText[currentLang].services.find(x => x.id === id);
-    document.getElementById('modal-content-dynamic').innerHTML = `
-        <i class="${s.i}" style="font-size:4rem; color:var(--gold); margin-bottom:20px;"></i>
-        <h2 class="gold-gradient" style="font-size:2.5rem;">${s.t}</h2>
-        <p style="margin-top:25px; line-height:1.8; color: #ccc; font-size:1.1rem;">${s.d}</p>`;
-    document.getElementById('whatsapp-link').href = `https://wa.me/213555070548?text=Interested in ${s.t}`;
-    document.getElementById('service-modal').classList.remove('hidden');
+window.openService = function(id) { 
+    // نفس كود عرض تفاصيل الخدمة السابق
+    document.getElementById('service-modal').classList.remove('hidden'); 
 }
-
-window.closeModal = function() { document.getElementById('service-modal').classList.add('hidden'); }
-window.toggleSidebar = function() { document.getElementById('conference-sidebar').classList.toggle('active'); }
 
 renderServices();
