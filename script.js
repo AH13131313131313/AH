@@ -361,3 +361,38 @@ window.deleteWork = async function(docId, fileUrl) {
         alert("تم الحذف بنجاح");
     }
 }
+// دالة لجلب وعرض الأعمال في لوحة التحكم
+function loadAdminWorks() {
+    const adminList = document.getElementById('admin-works-list');
+    
+    // استبدل 'showroom' باسم الـ Collection عندك
+    onSnapshot(collection(db, "showroom"), (snapshot) => {
+        adminList.innerHTML = ''; // تفريغ القائمة قبل التحديث
+        
+        if (snapshot.empty) {
+            adminList.innerHTML = '<p style="color: #555; text-align: center;">لا توجد أعمال منشورة حالياً.</p>';
+            return;
+        }
+
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            const workId = doc.id;
+
+            const item = document.createElement('div');
+            item.className = 'admin-work-item'; // تأكد من إضافة تنسيق لها في CSS
+            item.style = "display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; border: 1px solid #333; margin-bottom: 5px;";
+            
+            item.innerHTML = `
+                <div style="text-align: right;">
+                    <span style="color: var(--gold); font-weight: bold;">${data.title}</span>
+                    <br>
+                    <small style="color: #888;">${data.category}</small>
+                </div>
+                <button onclick="window.deleteWork('${workId}', '${data.url}')" style="background: #ff4d4d; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
+                    <i class="fas fa-trash"></i> حذف
+                </button>
+            `;
+            adminList.appendChild(item);
+        });
+    });
+}
