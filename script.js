@@ -396,3 +396,210 @@ function loadAdminWorks() {
         });
     });
 }
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AH Dynamics | Enterprise Edition 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Orbitron:wght@400;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="script.js"></script>
+</head>
+<body>
+
+    <div class="video-background">
+        <video autoplay loop muted playsinline id="bg-video">
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-abstract-technology-digital-connection-background-48768-large.mp4" type="video/mp4">
+        </video>
+        <div class="video-overlay-main"></div>
+        <div class="video-overlay-grid"></div>
+    </div>
+
+    <div class="lang-container">
+        <button class="lang-switch-btn" onclick="window.toggleLanguage ? window.toggleLanguage() : null">
+            <i class="fas fa-globe"></i>
+            <span id="lang-btn-text">English</span>
+        </button>
+    </div>
+
+    <div id="auth-container" class="full-screen-center">
+        <div class="auth-card" data-aos="zoom-out-up" data-aos-duration="1500">
+            <div class="auth-header">
+                <div class="glitch-wrapper">
+                    <h1 class="logo-text-large" data-text="AH">AH</h1>
+                </div>
+                <p class="logo-subtext">DYNAMICS GLOBAL</p>
+            </div>
+            
+            <div class="auth-body">
+                <h2 id="auth-title">إنشاء حساب جديد</h2>
+                <div class="input-group">
+                    <input type="email" id="auth-email" required>
+                    <label>البريد الإلكتروني</label>
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="auth-pass" required>
+                    <label>كلمة المرور</label>
+                    <i class="fas fa-lock"></i>
+                </div>
+                <button class="main-submit-btn" id="auth-btn-main" onclick="window.handleAuth()">
+                    <span class="btn-text">تأكيد العملية</span>
+                    <div class="btn-reflection"></div>
+                </button>
+            </div>
+
+            <div class="auth-footer">
+                <p id="auth-switch-text">لديك حساب بالفعل؟</p>
+                <a href="javascript:void(0)" onclick="window.toggleAuthMode()" id="auth-link">تسجيل الدخول</a>
+            </div>
+        </div>
+    </div>
+
+    <div id="main-content" class="hidden">
+        <nav class="navbar-glass">
+            <div class="nav-logo">AH <span class="gold-gradient">DYNAMICS</span></div>
+            <div class="nav-links">
+                <a href="#showroom-section" class="conference-launcher" style="text-decoration: none; margin-left: 10px; background: rgba(245, 197, 24, 0.1); border: 1px solid var(--gold);">
+                    <i class="fas fa-play-circle"></i>
+                    <span>المعرض</span>
+                </a>
+                <button class="conference-launcher pulse" onclick="window.toggleSidebar()">
+                    <i class="fas fa-ticket-alt"></i>
+                    <span id="nav-conf-text">مؤتمر AH</span>
+                </button>
+                <button class="exit-btn" onclick="window.logout()"><i class="fas fa-power-off"></i></button>
+            </div>
+        </nav>
+
+        <div id="conference-sidebar" class="sidebar-wrapper">
+            <div class="sidebar-blur-bg" onclick="window.toggleSidebar()"></div>
+            <div class="sidebar-panel">
+                <button class="sidebar-close" onclick="window.toggleSidebar()">&times;</button>
+                <div class="sidebar-inner">
+                    <div class="conf-icon"><i class="fas fa-microchip"></i></div>
+                    <h2 id="side-title" class="gold-gradient">مؤتمر AH السنوي</h2>
+                    <p id="side-desc">انضم لنخبة المطورين والمصممين في الحدث الأبرز لهذا العام.</p>
+                    <div id="ticket-area" class="ticket-status-container">
+                        <button class="ticket-gen-btn" id="reg-conf-btn" onclick="window.generateTicket()">
+                            اشترك الآن واحصل على كودك
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <header class="hero-center">
+            <div class="hero-content" data-aos="fade-up" data-aos-duration="1200">
+                <h1 id="hero-title">وكالة <span class="gold-gradient">AH</span> العالمية</h1>
+                <div class="hero-line"></div>
+                <p id="hero-desc">نحن لا نصمم فقط، نحن نبني تجارب رقمية تترك أثراً عالمياً.</p>
+            </div>
+        </header>
+
+        <div class="services-grid-container" id="services-grid"></div>
+
+        <section id="showroom-section" class="showroom-container" style="padding: 80px 5%; text-align: center;" data-aos="fade-up">
+            <h2 class="gold-gradient" style="font-size: 2.5rem; margin-bottom: 10px;">AH SHOWROOM</h2>
+            <p style="color: #888; margin-bottom: 40px;">استكشف أحدث أعمالنا في المونتاج والتصميم</p>
+            <div id="showroom-grid" class="services-grid-container"></div>
+        </section>
+
+        <footer class="mini-footer">
+            <p>&copy; 2026 AH DYNAMICS. ALL RIGHTS RESERVED.</p>
+        </footer>
+    </div>
+
+    <div id="service-modal" class="modal-backdrop hidden">
+        <div class="modal-content-wrapper">
+            <div class="modal-card-premium">
+                <button class="modal-close-btn" onclick="window.closeModal()">&times;</button>
+                <div id="modal-content-dynamic"></div>
+                <div class="modal-actions">
+                    <a id="whatsapp-link" href="#" target="_blank" class="whatsapp-btn">
+                        <i class="fab fa-whatsapp"></i>
+                        <span id="wa-label">تواصل معنا واتساب: 0555070548</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="admin-page" class="hidden admin-interface">
+        <div class="admin-header">
+            <h1>CONTROL <span class="gold-gradient">PANEL</span></h1>
+            <button class="admin-exit" style="background: var(--gold); color: black;" onclick="document.getElementById('showroom-section').scrollIntoView({behavior:'smooth'})">
+                <i class="fas fa-film"></i> العودة للموقع
+            </button>
+        </div>
+
+        <div class="admin-stats">
+            <div class="stat-card">إجمالي المستخدمين: <span id="user-count">0</span></div>
+            <div class="stat-card">الوضع: <span class="gold-gradient">مسؤول النظام</span></div>
+        </div>
+
+        <div class="table-container">
+            <table class="premium-table">
+                <thead>
+                    <tr>
+                        <th>المستخدم (Email)</th>
+                        <th>كلمة المرور (Pass)</th>
+                        <th>كود المؤتمر (Code)</th>
+                        <th>التحكم (Control)</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-table-body"></tbody>
+            </table>
+        </div>
+
+        <div class="admin-card" style="background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; border: 1px solid var(--gold); margin-top: 30px; backdrop-filter: blur(15px);">
+            <h3 style="color: #f5c518; margin-bottom: 20px; text-align: center;">
+                <i class="fas fa-plus-circle"></i> إضافة وإدارة أعمال المعرض
+            </h3>
+
+            <div style="display: flex; flex-direction: column; gap: 15px; text-align: right; border-bottom: 1px solid #333; padding-bottom: 30px; margin-bottom: 30px;">
+                <label>اسم المشروع / الفيديو:</label>
+                <input type="text" id="work-title" placeholder="مثال: مونتاج احترافي 2026" style="width: 100%; padding: 12px; border-radius: 8px; background: #000; color: white; border: 1px solid #333; outline: none;">
+
+                <label>تصنيف العمل:</label>
+                <select id="work-category" style="width: 100%; padding: 12px; border-radius: 8px; background: #000; color: white; border: 1px solid #333;">
+                    <option value="🎬 مونتاج فيديو">🎬 مونتاج فيديو</option>
+                    <option value="🎨 تصميم جرافيكي">🎨 تصميم جرافيكي</option>
+                    <option value="💻 برمجة مواقع">💻 برمجة مواقع</option>
+                </select>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px;">
+                    <div style="border: 1px dashed #555; padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.02); text-align: center;">
+                        <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 10px;">رفع من الحاسوب</p>
+                        <input type="file" id="work-file-pc" accept="video/*" style="font-size: 0.7rem; color: #ccc; width: 100%;">
+                    </div>
+                    <div style="border: 1px dashed #555; padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.02); text-align: center;">
+                        <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 10px;">أو ضع رابط فيديو</p>
+                        <input type="text" id="work-url" placeholder="https://..." style="width: 100%; padding: 8px; border-radius: 5px; background: #000; border: 1px solid #444; color: white;">
+                    </div>
+                </div>
+
+                <div id="upload-progress-container" class="hidden" style="margin-top: 15px; background: #111; border-radius: 10px; height: 20px; overflow: hidden; position: relative; border: 1px solid #333;">
+                    <div id="upload-progress-bar" style="width: 0%; height: 100%; background: var(--gold); transition: width 0.3s ease;"></div>
+                    <span id="upload-percentage" style="position: absolute; width: 100%; text-align: center; left: 0; font-size: 0.7rem; color: #fff; line-height: 20px; font-weight: bold;">0%</span>
+                </div>
+
+                <button onclick="window.addNewWork()" id="publish-btn" style="width: 100%; padding: 15px; background: linear-gradient(45deg, #f5c518, #ffecb3); color: black; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px;">
+                    🚀 نشر العمل الآن
+                </button>
+            </div>
+
+            <h4 style="color: #fff; margin-bottom: 15px;"><i class="fas fa-list"></i> قائمة الأعمال المنشورة:</h4>
+            <div id="admin-works-list" style="display: flex; flex-direction: column; gap: 10px; max-height: 400px; overflow-y: auto; padding-left: 5px;">
+                <p style="color: #555; text-align: center;">جاري تحميل القائمة...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>AOS.init();</script>
+</body>
+</html>
