@@ -95,6 +95,84 @@ body { background-color: var(--bg-dark); color: white; overflow-x: hidden; text-
 .service-card:hover .service-overlay-content i { transform: translateY(0); opacity: 1; }
 .service-overlay-content h3 { font-size: 2rem; font-weight: 900; margin-bottom: 10px; }
 
+/* =========================================
+   تفاصيل المعرض الأسطوري (جديد)
+   ========================================= */
+
+.showroom-container { padding: 80px 5%; min-height: 100vh; }
+
+.video-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
+    gap: 30px; 
+    margin-top: 40px; 
+}
+
+.video-card-premium {
+    background: #0a0a0a;
+    border-radius: 25px;
+    border: 1px solid var(--glass-border);
+    overflow: hidden;
+    position: relative;
+    height: 400px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+    transition: 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.video-card-premium:hover {
+    transform: translateY(-15px) scale(1.02);
+    border-color: var(--gold);
+    box-shadow: 0 30px 60px rgba(245, 197, 24, 0.2);
+}
+
+.video-card-premium video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.5;
+    transition: 0.5s;
+}
+
+.video-card-premium:hover video {
+    opacity: 1;
+}
+
+.card-info-overlay {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 25px;
+    background: linear-gradient(to top, #000 40%, transparent 100%);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.admin-upload-panel {
+    background: rgba(245, 197, 24, 0.05);
+    border: 2px dashed var(--gold);
+    padding: 30px;
+    border-radius: 25px;
+    margin-bottom: 50px;
+    backdrop-filter: blur(10px);
+}
+
+.admin-upload-panel input {
+    padding: 12px 20px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    color: white;
+    margin: 10px;
+    outline: none;
+}
+
+.admin-upload-panel input:focus {
+    border-color: var(--gold);
+}
+
+/* ========================================= */
+
 /* النافذة المنبثقة (Modal) */
 .modal-backdrop { position: fixed; inset: 0; z-index: 5000; background: rgba(0,0,0,0.95); backdrop-filter: blur(15px); display: flex; justify-content: center; align-items: center; padding: 20px; }
 .modal-card-premium { background: #0a0a0a; border: 1px solid var(--gold); width: 100%; max-width: 600px; border-radius: 35px; padding: 60px 40px; position: relative; box-shadow: 0 0 100px rgba(245, 197, 24, 0.2); }
@@ -120,4 +198,5 @@ body { background-color: var(--bg-dark); color: white; overflow-x: hidden; text-
     .sidebar-panel { width: 100%; right: -100%; }
     .logo-text-large { font-size: 3.5rem; }
     .navbar-glass { padding: 15px 5%; }
+    .admin-upload-panel input { width: 90%; }
 }

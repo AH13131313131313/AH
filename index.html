@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<script type="module" src="script.js"></script>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -9,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <script type="module" src="script.js"></script>
 </head>
 <body>
 
@@ -21,7 +21,7 @@
     </div>
 
     <div class="lang-container">
-        <button class="lang-switch-btn" onclick="toggleLanguage()">
+        <button class="lang-switch-btn" onclick="window.toggleLanguage ? window.toggleLanguage() : null">
             <i class="fas fa-globe"></i>
             <span id="lang-btn-text">English</span>
         </button>
@@ -48,7 +48,7 @@
                     <label>كلمة المرور</label>
                     <i class="fas fa-lock"></i>
                 </div>
-                <button class="main-submit-btn" id="auth-btn-main" onclick="handleAuth()">
+                <button class="main-submit-btn" id="auth-btn-main" onclick="window.handleAuth()">
                     <span class="btn-text">تأكيد العملية</span>
                     <div class="btn-reflection"></div>
                 </button>
@@ -56,7 +56,7 @@
 
             <div class="auth-footer">
                 <p id="auth-switch-text">لديك حساب بالفعل؟</p>
-                <a href="javascript:void(0)" onclick="toggleAuthMode()" id="auth-link">تسجيل الدخول</a>
+                <a href="javascript:void(0)" onclick="window.toggleAuthMode()" id="auth-link">تسجيل الدخول</a>
             </div>
         </div>
     </div>
@@ -65,25 +65,29 @@
         <nav class="navbar-glass">
             <div class="nav-logo">AH <span class="gold-gradient">DYNAMICS</span></div>
             <div class="nav-links">
-                <button class="conference-launcher pulse" onclick="toggleSidebar()">
+                <a href="#showroom-section" class="conference-launcher" style="text-decoration: none; margin-left: 10px; background: rgba(245, 197, 24, 0.1); border: 1px solid var(--gold);">
+                    <i class="fas fa-play-circle"></i>
+                    <span>المعرض</span>
+                </a>
+                <button class="conference-launcher pulse" onclick="window.toggleSidebar()">
                     <i class="fas fa-ticket-alt"></i>
                     <span id="nav-conf-text">مؤتمر AH</span>
                 </button>
-                <button class="exit-btn" onclick="logout()"><i class="fas fa-power-off"></i></button>
+                <button class="exit-btn" onclick="window.logout()"><i class="fas fa-power-off"></i></button>
             </div>
         </nav>
 
         <div id="conference-sidebar" class="sidebar-wrapper">
-            <div class="sidebar-blur-bg" onclick="toggleSidebar()"></div>
+            <div class="sidebar-blur-bg" onclick="window.toggleSidebar()"></div>
             <div class="sidebar-panel">
-                <button class="sidebar-close" onclick="toggleSidebar()">&times;</button>
+                <button class="sidebar-close" onclick="window.toggleSidebar()">&times;</button>
                 <div class="sidebar-inner">
                     <div class="conf-icon"><i class="fas fa-microchip"></i></div>
                     <h2 id="side-title" class="gold-gradient">مؤتمر AH السنوي</h2>
                     <p id="side-desc">انضم لنخبة المطورين والمصممين في الحدث الأبرز لهذا العام.</p>
                     
                     <div id="ticket-area" class="ticket-status-container">
-                        <button class="ticket-gen-btn" id="reg-conf-btn" onclick="generateTicket()">
+                        <button class="ticket-gen-btn" id="reg-conf-btn" onclick="window.generateTicket()">
                             اشترك الآن واحصل على كودك
                         </button>
                     </div>
@@ -99,8 +103,41 @@
             </div>
         </header>
 
-        <div class="services-grid-container" id="services-grid">
+        <div class="services-grid-container" id="services-grid"></div>
+
+        <section id="showroom-section" class="showroom-container" style="padding: 80px 5%; text-align: center;" data-aos="fade-up">
+            <h2 class="gold-gradient" style="font-size: 2.5rem; margin-bottom: 10px;">AH SHOWROOM</h2>
+            <p style="color: #888; margin-bottom: 40px;">استكشف أحدث أعمالنا في المونتاج والتصميم</p>
+
+            <div id="admin-showroom-controls" class="admin-upload-panel hidden" style="background: rgba(255,255,255,0.05); padding: 25px; border-radius: 20px; border: 1px solid var(--gold); margin-bottom: 40px; max-width: 650px; margin-left: auto; margin-right: auto; backdrop-filter: blur(10px); display: none;">
+                <h3 style="color: var(--gold); margin-bottom: 20px;"><i class="fas fa-cloud-upload-alt"></i> إدارة محتوى المعرض</h3>
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <input type="text" id="work-title" placeholder="عنوان العمل (مثال: مونتاج احترافي)" style="padding: 12px; border-radius: 8px; border: 1px solid #333; background: #000; color: #fff;">
+                    
+                    <div style="display: flex; gap: 10px; align-items: center; justify-content: center; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px;">
+                        <div style="flex: 1;">
+                            <label style="color: #aaa; font-size: 0.75rem; display: block; margin-bottom: 5px;">الخيار 1: رابط مباشر</label>
+                            <input type="text" id="work-url" placeholder="https://..." style="width: 90%; padding: 10px; border-radius: 5px; border: 1px solid #444; background: #000; color: #fff;">
+                        </div>
+                        <div style="color: var(--gold); font-weight: bold; margin-top: 15px;">أو</div>
+                        <div style="flex: 1;">
+                            <label style="color: #aaa; font-size: 0.75rem; display: block; margin-bottom: 5px;">الخيار 2: رفع من الجهاز</label>
+                            <input type="file" id="work-file-pc" accept="video/*" style="width: 90%; color: #fff; font-size: 0.8rem;">
+                        </div>
+                    </div>
+
+                    <select id="work-category" style="padding: 12px; border-radius: 8px; border: 1px solid #333; background: #000; color: #fff;">
+                        <option value="🎬 مونتاج فيديو">🎬 مونتاج فيديو</option>
+                        <option value="🎨 تصميم جرافيكي">🎨 تصميم جرافيكي</option>
+                        <option value="💻 برمجة مواقع">💻 برمجة مواقع</option>
+                    </select>
+                    
+                    <button onclick="window.addNewWork()" class="gold-btn" style="padding: 15px; cursor: pointer; font-weight: 700; font-family: 'Cairo';">نشر العمل الآن في المعرض</button>
+                </div>
             </div>
+
+            <div id="showroom-grid" class="services-grid-container"></div>
+        </section>
 
         <footer class="mini-footer">
             <p>&copy; 2026 AH DYNAMICS. ALL RIGHTS RESERVED.</p>
@@ -110,9 +147,8 @@
     <div id="service-modal" class="modal-backdrop hidden">
         <div class="modal-content-wrapper">
             <div class="modal-card-premium">
-                <button class="modal-close-btn" onclick="closeModal()">&times;</button>
-                <div id="modal-content-dynamic">
-                    </div>
+                <button class="modal-close-btn" onclick="window.closeModal()">&times;</button>
+                <div id="modal-content-dynamic"></div>
                 <div class="modal-actions">
                     <a id="whatsapp-link" href="#" target="_blank" class="whatsapp-btn">
                         <i class="fab fa-whatsapp"></i>
@@ -126,10 +162,18 @@
     <div id="admin-page" class="hidden admin-interface">
         <div class="admin-header">
             <h1>CONTROL <span class="gold-gradient">PANEL</span></h1>
-            <button class="admin-exit" onclick="backToSite()">الخروج من اللوحة</button>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+                 <button class="admin-exit" style="background: var(--gold); color: black;" onclick="document.getElementById('showroom-section').scrollIntoView({behavior:'smooth'})">
+                    <i class="fas fa-film"></i> إدارة المعرض
+                 </button>
+                 <button class="admin-exit" style="background: #ff3333; border-color: #ff3333;" onclick="window.logout()">
+                    <i class="fas fa-sign-out-alt"></i> تسجيل خروج
+                 </button>
+            </div>
         </div>
         <div class="admin-stats">
             <div class="stat-card">إجمالي المستخدمين: <span id="user-count">0</span></div>
+            <div class="stat-card">الوضع: <span class="gold-gradient">مسؤول النظام</span></div>
         </div>
         <div class="table-container">
             <table class="premium-table">
@@ -147,6 +191,5 @@
     </div>
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="script.js"></script>
 </body>
 </html>
