@@ -157,12 +157,12 @@
             </table>
         </div>
 
-        <div class="admin-card" style="background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; border: 1px solid var(--gold); margin-top: 30px; backdrop-filter: blur(15px);">
+        <div class="admin-card" id="admin-showroom-controls" style="background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; border: 1px solid var(--gold); margin-top: 30px; backdrop-filter: blur(15px);">
             <h3 style="color: #f5c518; margin-bottom: 20px; text-align: center;">
-                <i class="fas fa-plus-circle"></i> إضافة عمل جديد للمعرض
+                <i class="fas fa-plus-circle"></i> إدارة أعمال المعرض
             </h3>
 
-            <div style="display: flex; flex-direction: column; gap: 15px; text-align: right; border-bottom: 1px solid #333; padding-bottom: 20px; margin-bottom: 20px;">
+            <div style="display: flex; flex-direction: column; gap: 15px; text-align: right; border-bottom: 1px solid #333; padding-bottom: 30px; margin-bottom: 30px;">
                 <label>اسم المشروع / الفيديو:</label>
                 <input type="text" id="work-title" placeholder="مثال: مونتاج احترافي 2026" style="width: 100%; padding: 12px; border-radius: 8px; background: #000; color: white; border: 1px solid #333; outline: none;">
 
@@ -175,11 +175,11 @@
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px;">
                     <div style="border: 1px dashed #555; padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.02); text-align: center;">
-                        <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 10px;">رفع ملف الفيديو</p>
+                        <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 10px;">رفع من الحاسوب</p>
                         <input type="file" id="work-file-pc" accept="video/*" style="font-size: 0.7rem; color: #ccc; width: 100%;">
                     </div>
                     <div style="border: 1px dashed #555; padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.02); text-align: center;">
-                        <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 10px;">أو ضع رابط خارجي</p>
+                        <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 10px;">أو ضع رابط فيديو</p>
                         <input type="text" id="work-url" placeholder="https://..." style="width: 100%; padding: 8px; border-radius: 5px; background: #000; border: 1px solid #444; color: white;">
                     </div>
                 </div>
@@ -189,7 +189,7 @@
                 </button>
             </div>
 
-            <h4 style="color: #fff; margin-bottom: 15px;"><i class="fas fa-trash-alt"></i> حذف الأعمال المنشورة:</h4>
+            <h4 style="color: #fff; margin-bottom: 15px;"><i class="fas fa-list"></i> قائمة الأعمال المنشورة (للحذف):</h4>
             <div id="admin-works-list" style="display: flex; flex-direction: column; gap: 10px; max-height: 400px; overflow-y: auto; padding-left: 5px;">
                 <p style="color: #555; text-align: center;">جاري تحميل القائمة...</p>
             </div>
