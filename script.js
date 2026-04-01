@@ -1,6 +1,6 @@
 // 1. استيراد المكتبات من CDN
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, set, onValue, remove, child, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { getDatabase, ref, set, onValue, remove, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
 // 2. إعدادات Firebase
 const firebaseConfig = {
@@ -25,7 +25,7 @@ const ADMIN_PASS = "fati0476";
 let loginMode = false;
 let currentUserEmail = "";
 
-// --- وظائف الهوية (Login/Register) ---
+// --- وظائف الهوية ---
 window.toggleAuthMode = function() {
     loginMode = !loginMode;
     document.getElementById('auth-title').innerText = loginMode ? "تسجيل الدخول" : "إنشاء حساب جديد";
@@ -65,7 +65,6 @@ function saveSession(key) {
 }
 
 // --- نظام المعرض (Showroom) ---
-
 window.addNewWork = function() {
     const title = document.getElementById('work-title').value.trim();
     const category = document.getElementById('work-category').value;
@@ -152,7 +151,6 @@ window.deleteWork = function(key) {
 };
 
 // --- التحكم في الصفحات ولوحة الإدارة ---
-
 function enterSite() {
     document.getElementById('auth-container').classList.add('hidden');
     document.getElementById('main-content').classList.remove('hidden');
@@ -164,34 +162,34 @@ function showAdminPanel() {
     const adminPage = document.getElementById('admin-page');
     adminPage.classList.remove('hidden');
 
-    // إضافة زر خروج الأدمن الملون
+    // التأكد من إضافة زر تسجيل الخروج مرة واحدة فقط
     if (!document.getElementById('admin-logout-btn')) {
         const logoutBtn = document.createElement('button');
         logoutBtn.id = 'admin-logout-btn';
         logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> تسجيل خروج المسؤول';
-        logoutBtn.style = "background: #ff4d4d; color: white; margin: 20px auto; display: block; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; border: 1px solid rgba(255,255,255,0.2); transition: 0.3s;";
+        // تنسيق الزر ليكون واضحاً في الأعلى
+        logoutBtn.style = "background: #ff4d4d; color: white; margin: 10px auto 20px auto; display: block; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; border: 1px solid rgba(255,255,255,0.2); shadow: 0 4px 15px rgba(255, 77, 77, 0.3);";
         
         logoutBtn.onclick = window.logout;
-        adminPage.prepend(logoutBtn);
+        adminPage.prepend(logoutBtn); // وضعه في أول قسم الأدمن
     }
 
     loadAdminWorksList();
 }
 
 window.logout = function() {
-    if(confirm("هل تريد تسجيل الخروج؟")) {
+    if(confirm("هل تريد تسجيل الخروج والعودة لصفحة الدخول؟")) {
         localStorage.removeItem('ah_user_session');
-        location.reload();
+        location.reload(); // إعادة تحميل الصفحة لتصفير كل شيء
     }
 };
 
-// --- بدء التشغيل والتحقق من الجلسة ---
+// --- التحقق من الجلسة عند التحميل ---
 window.addEventListener('DOMContentLoaded', () => {
     const saved = localStorage.getItem('ah_user_session');
     if (saved) {
         currentUserEmail = saved;
         const adminKey = ADMIN_EMAIL.replace(/\./g, '_');
-        
         if (saved === adminKey) { 
             showAdminPanel(); 
         } else { 
