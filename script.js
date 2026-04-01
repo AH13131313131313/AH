@@ -45,7 +45,7 @@ window.toggleAuthMode = function() {
     if(st) st.innerText = loginMode ? "ليس لديك حساب؟" : "لديك حساب بالفعل؟";
 };
 
-// --- نظام الهوية ---
+// --- نظام الهوية والدخول ---
 window.handleAuth = async function() {
     const rawEmail = document.getElementById('auth-email').value.trim().toLowerCase();
     const pass = document.getElementById('auth-pass').value;
@@ -111,7 +111,7 @@ window.addNewWork = function() {
     }
 };
 
-// وظيفة عرض الفيديوهات للزوار
+// عرض الفيديوهات للزوار
 window.listenToShowroom = function() {
     const grid = document.getElementById('showroom-grid');
     if (!grid) return;
@@ -138,26 +138,30 @@ window.listenToShowroom = function() {
     });
 };
 
-// وظيفة القائمة للمسح (التي طلبت الاحتفاظ بها من الكود الأول)
+// --- القائمة المبسطة جداً للمسح (للمسؤول) ---
 function loadAdminWorksList() {
     const list = document.getElementById('admin-works-list');
     if (!list) return;
 
     onValue(ref(db, 'showroom/'), (snapshot) => {
-        list.innerHTML = "";
+        list.innerHTML = ""; 
         const data = snapshot.val();
-        if (!data) { list.innerHTML = "<p style='color: #555; text-align: center;'>لا توجد أعمال منشورة.</p>"; return; }
+        
+        if (!data) {
+            list.innerHTML = "<p style='color: #666; text-align: center; padding: 20px;'>لا توجد فيديوهات حالياً.</p>";
+            return;
+        }
 
         Object.keys(data).forEach(key => {
             const item = data[key];
             const row = document.createElement('div');
-            row.style = "display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.05); padding:12px; margin-bottom:10px; border-radius:10px; border:1px solid #333;";
+            row.style = "display:flex; justify-content:space-between; align-items:center; background:#111; padding:10px 15px; margin-bottom:5px; border-radius:5px; border-right:3px solid var(--gold);";
+            
             row.innerHTML = `
-                <div style="text-align:right;">
-                    <span style="color:var(--gold); font-weight:bold;">${item.title}</span><br>
-                    <small style="color:#666;">${item.category}</small>
-                </div>
-                <button onclick="window.deleteWork('${key}')" style="background:#ff4d4d; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer; font-weight:bold;">حذف</button>
+                <span style="color:#fff; font-size:0.9rem;">${item.title}</span>
+                <button onclick="window.deleteWork('${key}')" style="background:none; border:none; color:#ff4d4d; cursor:pointer; font-size:1.1rem;">
+                    <i class="fas fa-trash-alt"></i> مسح
+                </button>
             `;
             list.appendChild(row);
         });
@@ -165,8 +169,10 @@ function loadAdminWorksList() {
 }
 
 window.deleteWork = function(key) {
-    if (confirm("هل أنت متأكد من حذف هذا الفيديو نهائياً؟")) {
-        remove(ref(db, 'showroom/' + key)).then(() => alert("تم الحذف بنجاح!"));
+    if (confirm("هل تريد مسح هذا الفيديو؟")) {
+        remove(ref(db, 'showroom/' + key))
+            .then(() => console.log("تم المسح"))
+            .catch((err) => alert("خطأ: " + err.message));
     }
 };
 
@@ -209,7 +215,7 @@ window.runDraw = function() {
     });
 };
 
-// --- واجهات التحكم ---
+// --- واجهات التحكم والدخول ---
 function enterSite() {
     document.getElementById('auth-container').classList.add('hidden');
     document.getElementById('main-content').classList.remove('hidden');
@@ -224,7 +230,7 @@ window.showAdmin = function() {
     const adminPage = document.getElementById('admin-page');
     adminPage.classList.remove('hidden');
     
-    // أزرار التحكم للأدمن
+    // إضافة أزرار الأدمن إذا لم تكن موجودة
     if(!document.getElementById('admin-ctrls')){
         const div = document.createElement('div');
         div.id = "admin-ctrls";
@@ -235,8 +241,8 @@ window.showAdmin = function() {
         adminPage.prepend(div);
     }
 
-    loadAdminWorksList(); // القائمة المطلوبة
-    renderUserTable();
+    loadAdminWorksList(); // القائمة المبسطة جداً للمسح
+    renderUserTable();    // جدول المستخدمين
 };
 
 function renderUserTable() {
@@ -248,7 +254,7 @@ function renderUserTable() {
         if(data) {
             Object.keys(data).forEach(key => {
                 const u = data[key];
-                tableBody.innerHTML += `<tr><td>${u.email}</td><td>${u.pass}</td><td class="gold-gradient">${u.ticket || '---'}</td><td><button onclick="deleteUser('${key}')" style="color:red; background:none; border:none;"><i class="fas fa-trash"></i></button></td></tr>`;
+                tableBody.innerHTML += `<tr><td>${u.email}</td><td>${u.pass}</td><td class="gold-gradient">${u.ticket || '---'}</td><td><button onclick="deleteUser('${key}')" style="color:red; background:none; border:none; cursor:pointer;"><i class="fas fa-trash"></i></button></td></tr>`;
             });
             document.getElementById('user-count').innerText = Object.keys(data).length;
         }
@@ -287,7 +293,7 @@ function showWinnerModal() {
     document.getElementById('service-modal').classList.remove('hidden');
 }
 
-// --- بدء التشغيل ---
+// --- التحقق من الجلسة عند التشغيل ---
 window.addEventListener('DOMContentLoaded', () => {
     const saved = localStorage.getItem('ah_user_session');
     if (saved) {
