@@ -603,3 +603,56 @@ function loadAdminWorks() {
     <script>AOS.init();</script>
 </body>
 </html>
+// استيراد الدوال اللازمة من Firebase (تأكد من وجودها في أعلى الملف)
+// import { doc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// 1. دالة لجلب الأعمال وعرضها في قائمة الحذف تلقائياً
+window.loadAdminInventory = function() {
+    const adminList = document.getElementById('admin-works-list');
+    
+    // الاستماع للتغييرات في قاعدة البيانات لحظياً
+    onSnapshot(collection(db, "showroom"), (snapshot) => {
+        adminList.innerHTML = ''; // تفريغ القائمة الحالية
+
+        if (snapshot.empty) {
+            adminList.innerHTML = '<p style="color: #555; text-align: center; padding: 20px;">لا توجد أعمال لعرضها.</p>';
+            return;
+        }
+
+        snapshot.forEach((documentSnapshot) => {
+            const work = documentSnapshot.data();
+            const id = documentSnapshot.id;
+
+            const item = document.createElement('div');
+            item.style = "display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; border: 1px solid #222; margin-bottom: 10px;";
+            
+            item.innerHTML = `
+                <div style="text-align: right;">
+                    <strong style="color: var(--gold); display: block;">${work.title || 'بدون عنوان'}</strong>
+                    <small style="color: #777;">${work.category || 'عام'}</small>
+                </div>
+                <button onclick="window.confirmDelete('${id}')" style="background: #ff4d4d; color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; transition: 0.3s;">
+                    <i class="fas fa-trash-alt"></i> حذف نهائي
+                </button>
+            `;
+            adminList.appendChild(item);
+        });
+    });
+};
+
+// 2. دالة التأكيد والحذف الفعلية
+window.confirmDelete = async function(docId) {
+    if (confirm("هل أنت متأكد من حذف هذا العمل؟ سيختفي من المعرض فوراً.")) {
+        try {
+            // حذف البيانات من Firestore
+            await deleteDoc(doc(db, "showroom", docId));
+            alert("تم الحذف بنجاح!");
+        } catch (error) {
+            console.error("خطأ أثناء الحذف:", error);
+            alert("حدث خطأ، تأكد من صلاحيات Firebase (Rules)");
+        }
+    }
+};
+
+// تشغيل الدالة عند تحميل الصفحة للتأكد من ظهور القائمة
+window.loadAdminInventory();
