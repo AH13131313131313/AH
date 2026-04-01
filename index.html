@@ -159,10 +159,10 @@
 
         <div class="admin-card" style="background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; border: 1px solid var(--gold); margin-top: 30px; backdrop-filter: blur(15px);">
             <h3 style="color: #f5c518; margin-bottom: 20px; text-align: center;">
-                <i class="fas fa-plus-circle"></i> إضافة وإدارة أعمال المعرض
+                <i class="fas fa-plus-circle"></i> إضافة عمل جديد للمعرض
             </h3>
 
-            <div style="display: flex; flex-direction: column; gap: 15px; text-align: right; border-bottom: 1px solid #333; padding-bottom: 30px; margin-bottom: 30px;">
+            <div style="display: flex; flex-direction: column; gap: 15px; text-align: right; border-bottom: 1px solid #333; padding-bottom: 20px; margin-bottom: 20px;">
                 <label>اسم المشروع / الفيديو:</label>
                 <input type="text" id="work-title" placeholder="مثال: مونتاج احترافي 2026" style="width: 100%; padding: 12px; border-radius: 8px; background: #000; color: white; border: 1px solid #333; outline: none;">
 
@@ -175,18 +175,13 @@
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px;">
                     <div style="border: 1px dashed #555; padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.02); text-align: center;">
-                        <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 10px;">رفع من الحاسوب</p>
+                        <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 10px;">رفع ملف الفيديو</p>
                         <input type="file" id="work-file-pc" accept="video/*" style="font-size: 0.7rem; color: #ccc; width: 100%;">
                     </div>
                     <div style="border: 1px dashed #555; padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.02); text-align: center;">
-                        <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 10px;">أو ضع رابط فيديو</p>
+                        <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 10px;">أو ضع رابط خارجي</p>
                         <input type="text" id="work-url" placeholder="https://..." style="width: 100%; padding: 8px; border-radius: 5px; background: #000; border: 1px solid #444; color: white;">
                     </div>
-                </div>
-
-                <div id="upload-progress-container" class="hidden" style="margin-top: 15px; background: #111; border-radius: 10px; height: 20px; overflow: hidden; position: relative; border: 1px solid #333;">
-                    <div id="upload-progress-bar" style="width: 0%; height: 100%; background: var(--gold); transition: width 0.3s ease;"></div>
-                    <span id="upload-percentage" style="position: absolute; width: 100%; text-align: center; left: 0; font-size: 0.7rem; color: #fff; line-height: 20px; font-weight: bold;">0%</span>
                 </div>
 
                 <button onclick="window.addNewWork()" id="publish-btn" style="width: 100%; padding: 15px; background: linear-gradient(45deg, #f5c518, #ffecb3); color: black; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px;">
@@ -194,7 +189,7 @@
                 </button>
             </div>
 
-            <h4 style="color: #fff; margin-bottom: 15px;"><i class="fas fa-list"></i> قائمة الأعمال المنشورة:</h4>
+            <h4 style="color: #fff; margin-bottom: 15px;"><i class="fas fa-trash-alt"></i> حذف الأعمال المنشورة:</h4>
             <div id="admin-works-list" style="display: flex; flex-direction: column; gap: 10px; max-height: 400px; overflow-y: auto; padding-left: 5px;">
                 <p style="color: #555; text-align: center;">جاري تحميل القائمة...</p>
             </div>
