@@ -120,16 +120,14 @@ function renderTable() {
 }
 
 window.showAdmin = function() {
-    // 1. إظهار العناصر المخفية
     document.getElementById('auth-container').classList.add('hidden');
     document.getElementById('main-content').classList.remove('hidden');
     document.getElementById('admin-page').classList.remove('hidden');
-    
-    // 2. تفعيل لوحة تحكم المعرض (CRITICAL FIX)
+
     const adminShowroom = document.getElementById('admin-showroom-controls');
     if(adminShowroom) {
         adminShowroom.classList.remove('hidden');
-        adminShowroom.style.display = "block"; // تأكيد الظهور
+        adminShowroom.style.display = "block";
     }
 
     const adminArea = document.getElementById('admin-page');
@@ -172,7 +170,7 @@ window.joinDraw = function() {
         alert("تم دخولك في القرعة بنجاح! ✨");
         updateTicketDisplay();
     });
-};
+}; // تم إصلاح القوس هنا
 
 function updateTicketDisplay() {
     get(child(ref(db), `users/${currentUserEmail}`)).then((snapshot) => {
@@ -274,31 +272,36 @@ window.listenToShowroom = function() {
     });
 };
 
+// --- نظام رفع الفيديوهات المحدث ---
 window.addNewWork = function() {
     const title = document.getElementById('work-title').value;
     const urlInput = document.getElementById('work-url').value;
-    const fileInput = document.getElementById('work-file-pc').files[0];
+    const fileInputPc = document.getElementById('work-file-pc');
+    const file = fileInputPc ? fileInputPc.files[0] : null;
     const category = document.getElementById('work-category').value;
 
     if (!title) return alert("يرجى إدخال عنوان المشروع");
 
-    const saveToDB = (videoPath) => {
-        set(ref(db, 'showroom/' + Date.now()), { title, videoUrl: videoPath, category }).then(() => {
-            alert("✅ تم رفع ونشر العمل بنجاح!");
+    const saveToDB = (videoDataURL) => {
+        const newRef = ref(db, 'showroom/' + Date.now());
+        set(newRef, { title, videoUrl: videoDataURL, category }).then(() => {
+            alert("✅ تم الرفع بنجاح!");
             document.getElementById('work-title').value = "";
-            document.getElementById('work-url').value = "";
-            document.getElementById('work-file-pc').value = "";
-        });
+            if(document.getElementById('work-url')) document.getElementById('work-url').value = "";
+            if(fileInputPc) fileInputPc.value = "";
+        }).catch(err => alert("حدث خطأ أثناء الحفظ: " + err.message));
     };
 
-    if (fileInput) {
+    if (file) {
         const reader = new FileReader();
+        alert("جاري معالجة الفيديو، يرجى الانتظار...");
         reader.onload = (e) => saveToDB(e.target.result);
-        reader.readAsDataURL(fileInput);
+        reader.onerror = () => alert("فشل قراءة الملف!");
+        reader.readAsDataURL(file);
     } else if (urlInput) {
         saveToDB(urlInput);
     } else {
-        alert("يرجى وضع رابط فيديو أو اختيار ملف من الحاسوب");
+        alert("يرجى اختيار ملف من حاسوبك أو وضع رابط فيديو.");
     }
 };
 
@@ -325,3 +328,270 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
+window.addNewWork = function() {
+    const title = document.getElementById('work-title').value;
+    const category = document.getElementById('work-category').value;
+    const urlInput = document.getElementById('work-url').value;
+    const fileInput = document.getElementById('work-file-pc').files[0];
+    
+    let videoSrc = "";
+
+    // 1. التحقق من وجود فيديو (إما ملف أو رابط)
+    if (fileInput) {
+        // إذا رفع من الجهاز، نصنع رابطاً مؤقتاً
+        videoSrc = URL.createObjectURL(fileInput);
+    } else if (urlInput) {
+        videoSrc = urlInput;
+    }
+
+    if (!title || !videoSrc) {
+        alert("أرجوك أدخل عنوان الفيديو واختر ملفاً أو ضع رابطاً!");
+        return;
+    }
+
+    // 2. إنشاء العنصر في المعرض فوراً
+    const showroomGrid = document.getElementById('showroom-grid');
+    const workHTML = `
+        <div class="service-card" data-aos="fade-up">
+            <div class="service-icon">
+                <video src="${videoSrc}" controls style="width: 100%; border-radius: 10px;"></video>
+            </div>
+            <h3 class="gold-gradient">${title}</h3>
+            <p>${category}</p>
+        </div>
+    `;
+
+    showroomGrid.innerHTML += workHTML;
+
+    // 3. رسالة نجاح وإغلاق لوحة التحكم (اختياري)
+    alert("تمت إضافة العمل بنجاح!");
+    
+    // مسح الخانات بعد الرفع
+    document.getElementById('work-title').value = "";
+    document.getElementById('work-url').value = "";
+    document.getElementById('work-file-pc').value = "";
+};
+// دالة إضافة العمل الجديد للمعرض
+window.addNewWork = function() {
+    // 1. جلب القيم من العناصر التي صممناها في HTML
+    const title = document.getElementById('work-title').value;
+    const category = document.getElementById('work-category').value;
+    const urlInput = document.getElementById('work-url').value;
+    const fileInput = document.getElementById('work-file-pc').files[0];
+    const showroomGrid = document.getElementById('showroom-grid');
+
+    let videoSrc = "";
+
+    // 2. التحقق: هل رفع ملف من الجهاز أم وضع رابط؟
+    if (fileInput) {
+        // تحويل الملف المحلي إلى رابط كائن (Blob URL) ليتمكن المتصفح من تشغيله
+        videoSrc = URL.createObjectURL(fileInput);
+    } else if (urlInput) {
+        videoSrc = urlInput;
+    }
+
+    // 3. منع الإضافة إذا كانت الخانات فارغة
+    if (!title || !videoSrc) {
+        alert("يا صديقي، يرجى كتابة العنوان واختيار فيديو أولاً! ⚠️");
+        return;
+    }
+
+    // 4. بناء هيكل الكارت (Card) الجديد بتنسيق الـ Premium الخاص بك
+    const workCard = document.createElement('div');
+    workCard.className = 'service-card';
+    workCard.setAttribute('data-aos', 'fade-up'); // تفعيل أنيميشن AOS
+    
+    workCard.innerHTML = `
+        <div class="service-icon" style="overflow: hidden; border-radius: 12px; margin-bottom: 15px; border: 1px solid rgba(245, 197, 24, 0.3);">
+            <video src="${videoSrc}" controls style="width: 100%; display: block; background: #000;"></video>
+        </div>
+        <div class="service-info">
+            <h3 class="gold-gradient" style="margin-bottom: 5px;">${title}</h3>
+            <p style="color: #888; font-size: 0.9rem;">${category}</p>
+        </div>
+        <div class="card-glow"></div>
+    `;
+
+    // 5. إضافة الكارت إلى شبكة المعرض
+    showroomGrid.prepend(workCard); // prepend تجعل الجديد يظهر في البداية
+
+    // 6. تنظيف الخانات بعد النجاح
+    document.getElementById('work-title').value = "";
+    document.getElementById('work-url').value = "";
+    document.getElementById('work-file-pc').value = "";
+
+    // 7. رسالة نجاح وتأثير بصري بسيط
+    console.log("تمت إضافة العمل بنجاح:", title);
+    alert("🚀 تم نشر العمل في المعرض بنجاح!");
+};
+
+// دالة إضافة العمل الجديد للمعرض
+window.addNewWork = function() {
+    // 1. جلب القيم من العناصر التي صممناها في HTML
+    const title = document.getElementById('work-title').value;
+    const category = document.getElementById('work-category').value;
+    const urlInput = document.getElementById('work-url').value;
+    const fileInput = document.getElementById('work-file-pc').files[0];
+    const showroomGrid = document.getElementById('showroom-grid');
+
+    let videoSrc = "";
+
+    // 2. التحقق: هل رفع ملف من الجهاز أم وضع رابط؟
+    if (fileInput) {
+        // تحويل الملف المحلي إلى رابط كائن (Blob URL) ليتمكن المتصفح من تشغيله
+        videoSrc = URL.createObjectURL(fileInput);
+    } else if (urlInput) {
+        videoSrc = urlInput;
+    }
+
+    // 3. منع الإضافة إذا كانت الخانات فارغة
+    if (!title || !videoSrc) {
+        alert("يا صديقي، يرجى كتابة العنوان واختيار فيديو أولاً! ⚠️");
+        return;
+    }
+
+    // 4. بناء هيكل الكارت (Card) الجديد بتنسيق الـ Premium الخاص بك
+    const workCard = document.createElement('div');
+    workCard.className = 'service-card';
+    workCard.setAttribute('data-aos', 'fade-up'); // تفعيل أنيميشن AOS
+    
+    workCard.innerHTML = `
+        <div class="service-icon" style="overflow: hidden; border-radius: 12px; margin-bottom: 15px; border: 1px solid rgba(245, 197, 24, 0.3);">
+            <video src="${videoSrc}" controls style="width: 100%; display: block; background: #000;"></video>
+        </div>
+        <div class="service-info">
+            <h3 class="gold-gradient" style="margin-bottom: 5px;">${title}</h3>
+            <p style="color: #888; font-size: 0.9rem;">${category}</p>
+        </div>
+        <div class="card-glow"></div>
+    `;
+
+    // 5. إضافة الكارت إلى شبكة المعرض
+    showroomGrid.prepend(workCard); // prepend تجعل الجديد يظهر في البداية
+
+    // 6. تنظيف الخانات بعد النجاح
+    document.getElementById('work-title').value = "";
+    document.getElementById('work-url').value = "";
+    document.getElementById('work-file-pc').value = "";
+
+    // 7. رسالة نجاح وتأثير بصري بسيط
+    console.log("تمت إضافة العمل بنجاح:", title);
+    alert("🚀 تم نشر العمل في المعرض بنجاح!");
+};
+
+// دالة إضافة العمل الجديد للمعرض
+window.addNewWork = function() {
+    // 1. جلب القيم من العناصر التي صممناها في HTML
+    const title = document.getElementById('work-title').value;
+    const category = document.getElementById('work-category').value;
+    const urlInput = document.getElementById('work-url').value;
+    const fileInput = document.getElementById('work-file-pc').files[0];
+    const showroomGrid = document.getElementById('showroom-grid');
+
+    let videoSrc = "";
+
+    // 2. التحقق: هل رفع ملف من الجهاز أم وضع رابط؟
+    if (fileInput) {
+        // تحويل الملف المحلي إلى رابط كائن (Blob URL) ليتمكن المتصفح من تشغيله
+        videoSrc = URL.createObjectURL(fileInput);
+    } else if (urlInput) {
+        videoSrc = urlInput;
+    }
+
+    // 3. منع الإضافة إذا كانت الخانات فارغة
+    if (!title || !videoSrc) {
+        alert("يا صديقي، يرجى كتابة العنوان واختيار فيديو أولاً! ⚠️");
+        return;
+    }
+
+    // 4. بناء هيكل الكارت (Card) الجديد بتنسيق الـ Premium الخاص بك
+    const workCard = document.createElement('div');
+    workCard.className = 'service-card';
+    workCard.setAttribute('data-aos', 'fade-up'); // تفعيل أنيميشن AOS
+    
+    workCard.innerHTML = `
+        <div class="service-icon" style="overflow: hidden; border-radius: 12px; margin-bottom: 15px; border: 1px solid rgba(245, 197, 24, 0.3);">
+            <video src="${videoSrc}" controls style="width: 100%; display: block; background: #000;"></video>
+        </div>
+        <div class="service-info">
+            <h3 class="gold-gradient" style="margin-bottom: 5px;">${title}</h3>
+            <p style="color: #888; font-size: 0.9rem;">${category}</p>
+        </div>
+        <div class="card-glow"></div>
+    `;
+
+    // 5. إضافة الكارت إلى شبكة المعرض
+    showroomGrid.prepend(workCard); // prepend تجعل الجديد يظهر في البداية
+
+    // 6. تنظيف الخانات بعد النجاح
+    document.getElementById('work-title').value = "";
+    document.getElementById('work-url').value = "";
+    document.getElementById('work-file-pc').value = "";
+
+    // 7. رسالة نجاح وتأثير بصري بسيط
+    console.log("تمت إضافة العمل بنجاح:", title);
+    alert("🚀 تم نشر العمل في المعرض بنجاح!");
+};
+
+// ملاحظة: إذا كنت تستخدم AOS للأنيميشن، نحتاج لتحديثه ليقرأ العناصر الجديدة
+if (window.AOS) {
+    window.AOS.refresh();
+}
+window.addNewWork = function() {
+    // جلب العناصر بدقة بناءً على واجهتك
+    const titleInput = document.getElementById('work-title');
+    const categoryInput = document.getElementById('work-category');
+    const urlInput = document.getElementById('work-url');
+    const fileInput = document.getElementById('work-file-pc');
+    const showroomGrid = document.getElementById('showroom-grid');
+
+    const title = titleInput.value.trim();
+    const category = categoryInput.value;
+    const linkUrl = urlInput ? urlInput.value.trim() : "";
+    const file = fileInput.files[0];
+
+    let videoSrc = "";
+
+    // التحقق من المصدر: الأولوية للملف المرفوع ثم الرابط
+    if (file) {
+        videoSrc = URL.createObjectURL(file);
+    } else if (linkUrl) {
+        videoSrc = linkUrl;
+    }
+
+    // شرط التحقق لمنع ظهور رسالة الخطأ التي ظهرت في الصورة
+    if (!title || !videoSrc) {
+        alert("يا صديقي، يرجى كتابة العنوان واختيار فيديو أولاً! ⚠️");
+        return;
+    }
+
+    // بناء الكارت وتأكد من أن ID المعرض موجود في HTML
+    if (!showroomGrid) {
+        alert("خطأ: لم يتم العثور على منطقة عرض الفيديوهات (showroom-grid) في الصفحة.");
+        return;
+    }
+
+    const workCard = document.createElement('div');
+    workCard.className = 'service-card'; // نفس الكلاس المستخدم في CSS الخاص بك
+    workCard.setAttribute('data-aos', 'fade-up');
+    
+    workCard.innerHTML = `
+        <div class="service-icon" style="overflow: hidden; border-radius: 12px; border: 1px solid rgba(245, 197, 24, 0.3);">
+            <video src="${videoSrc}" controls style="width: 100%; display: block; background: #000;"></video>
+        </div>
+        <div class="service-info" style="margin-top: 15px;">
+            <h3 class="gold-gradient" style="font-size: 1.2rem;">${title}</h3>
+            <p style="color: #888;">${category}</p>
+        </div>
+    `;
+
+    // إضافة العمل الجديد في بداية المعرض
+    showroomGrid.prepend(workCard);
+
+    // تنظيف الحقول بعد النشر
+    titleInput.value = "";
+    if (urlInput) urlInput.value = "";
+    fileInput.value = "";
+
+    alert("🚀 تم نشر العمل في المعرض بنجاح!");
+};

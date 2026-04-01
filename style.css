@@ -200,3 +200,18 @@ body { background-color: var(--bg-dark); color: white; overflow-x: hidden; text-
     .navbar-glass { padding: 15px 5%; }
     .admin-upload-panel input { width: 90%; }
 }
+#work-file-pc::-webkit-file-upload-button {
+    background: linear-gradient(45deg, #00d2ff, #3a7bd5);
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+}
+#work-file-pc::-webkit-file-upload-button:hover {
+    box-shadow: 0 0 10px rgba(0, 210, 255, 0.5);
+}
+.hidden {
+    display: none !important;
+}

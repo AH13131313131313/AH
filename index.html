@@ -108,31 +108,35 @@
         <section id="showroom-section" class="showroom-container" style="padding: 80px 5%; text-align: center;" data-aos="fade-up">
             <h2 class="gold-gradient" style="font-size: 2.5rem; margin-bottom: 10px;">AH SHOWROOM</h2>
             <p style="color: #888; margin-bottom: 40px;">استكشف أحدث أعمالنا في المونتاج والتصميم</p>
-
-            <div id="admin-showroom-controls" class="admin-upload-panel hidden" style="background: rgba(255,255,255,0.05); padding: 25px; border-radius: 20px; border: 1px solid var(--gold); margin-bottom: 40px; max-width: 650px; margin-left: auto; margin-right: auto; backdrop-filter: blur(10px); display: none;">
-                <h3 style="color: var(--gold); margin-bottom: 20px;"><i class="fas fa-cloud-upload-alt"></i> إدارة محتوى المعرض</h3>
-                <div style="display: flex; flex-direction: column; gap: 15px;">
-                    <input type="text" id="work-title" placeholder="عنوان العمل (مثال: مونتاج احترافي)" style="padding: 12px; border-radius: 8px; border: 1px solid #333; background: #000; color: #fff;">
+            
+            <div id="admin-showroom-controls" class="admin-card hidden" style="background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; border: 1px solid var(--gold); margin: 20px auto; max-width: 700px; backdrop-filter: blur(15px);">
+                <h3 class="gold-gradient" style="margin-bottom: 20px;"><i class="fas fa-cloud-upload-alt"></i> إضافة عمل جديد للمعرض</h3>
+                
+                <div style="display: flex; flex-direction: column; gap: 15px; text-align: right;">
+                    <label style="color: var(--gold); font-size: 0.9rem;">اسم الفيديو / المشروع:</label>
+                    <input type="text" id="work-title" placeholder="مثال: مونتاج فيديو احترافي لعام 2026" style="width: 100%; padding: 12px; border-radius: 8px; background: #000; color: white; border: 1px solid #333;">
                     
-                    <div style="display: flex; gap: 10px; align-items: center; justify-content: center; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px;">
-                        <div style="flex: 1;">
-                            <label style="color: #aaa; font-size: 0.75rem; display: block; margin-bottom: 5px;">الخيار 1: رابط مباشر</label>
-                            <input type="text" id="work-url" placeholder="https://..." style="width: 90%; padding: 10px; border-radius: 5px; border: 1px solid #444; background: #000; color: #fff;">
-                        </div>
-                        <div style="color: var(--gold); font-weight: bold; margin-top: 15px;">أو</div>
-                        <div style="flex: 1;">
-                            <label style="color: #aaa; font-size: 0.75rem; display: block; margin-bottom: 5px;">الخيار 2: رفع من الجهاز</label>
-                            <input type="file" id="work-file-pc" accept="video/*" style="width: 90%; color: #fff; font-size: 0.8rem;">
-                        </div>
-                    </div>
-
-                    <select id="work-category" style="padding: 12px; border-radius: 8px; border: 1px solid #333; background: #000; color: #fff;">
+                    <label style="color: var(--gold); font-size: 0.9rem;">التصنيف:</label>
+                    <select id="work-category" style="width: 100%; padding: 12px; border-radius: 8px; background: #000; color: white; border: 1px solid #333;">
                         <option value="🎬 مونتاج فيديو">🎬 مونتاج فيديو</option>
                         <option value="🎨 تصميم جرافيكي">🎨 تصميم جرافيكي</option>
                         <option value="💻 برمجة مواقع">💻 برمجة مواقع</option>
                     </select>
-                    
-                    <button onclick="window.addNewWork()" class="gold-btn" style="padding: 15px; cursor: pointer; font-weight: 700; font-family: 'Cairo';">نشر العمل الآن في المعرض</button>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 10px;">
+                        <div style="border: 1px dashed #555; padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.02); text-align: center;">
+                            <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 10px;">الخيار 1: رفع من الحاسوب</p>
+                            <input type="file" id="work-file-pc" accept="video/*" style="font-size: 0.7rem; color: #ccc; width: 100%;">
+                        </div>
+                        <div style="border: 1px dashed #555; padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.02); text-align: center;">
+                            <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 10px;">الخيار 2: رابط فيديو جاهز</p>
+                            <input type="text" id="work-url" placeholder="https://..." style="width: 100%; padding: 8px; border-radius: 5px; background: #000; border: 1px solid #444; color: white;">
+                        </div>
+                    </div>
+
+                    <button onclick="window.addNewWork()" class="gold-btn" style="width: 100%; padding: 15px; font-weight: bold; margin-top: 10px; cursor: pointer;">
+                        🚀 نشر العمل في المعرض الآن
+                    </button>
                 </div>
             </div>
 
@@ -166,10 +170,7 @@
                  <button class="admin-exit" style="background: var(--gold); color: black;" onclick="document.getElementById('showroom-section').scrollIntoView({behavior:'smooth'})">
                     <i class="fas fa-film"></i> إدارة المعرض
                  </button>
-                 <button class="admin-exit" style="background: #ff3333; border-color: #ff3333;" onclick="window.logout()">
-                    <i class="fas fa-sign-out-alt"></i> تسجيل خروج
-                 </button>
-            </div>
+                 </div>
         </div>
         <div class="admin-stats">
             <div class="stat-card">إجمالي المستخدمين: <span id="user-count">0</span></div>
@@ -187,6 +188,46 @@
                 </thead>
                 <tbody id="admin-table-body"></tbody>
             </table>
+        </div>
+        <div>
+            <h3 style="color: #f5c518; margin-bottom: 20px; text-align: center;">
+        <i class="fas fa-plus-circle"></i> إضافة عمل جديد للمعرض
+    </h3>
+
+    <div style="display: flex; flex-direction: column; gap: 15px; text-align: right;">
+        
+        <label>اسم المشروع / الفيديو:</label>
+        <input type="text" id="work-title" placeholder="مثال: مونتاج احترافي 2026" 
+               style="width: 100%; padding: 12px; border-radius: 8px; background: #000; color: white; border: 1px solid #333; outline: none;">
+
+        <label>تصنيف العمل:</label>
+        <select id="work-category" style="width: 100%; padding: 12px; border-radius: 8px; background: #000; color: white; border: 1px solid #333;">
+            <option value="🎬 مونتاج فيديو">🎬 مونتاج فيديو</option>
+            <option value="🎨 تصميم جرافيكي">🎨 تصميم جرافيكي</option>
+            <option value="💻 برمجة مواقع">💻 برمجة مواقع</option>
+        </select>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px;">
+            
+            <div style="border: 1px dashed #555; padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.02); text-align: center;">
+                <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 10px;">رفع من الحاسوب</p>
+                <input type="file" id="work-file-pc" accept="video/*" style="font-size: 0.7rem; color: #ccc; width: 100%;">
+            </div>
+
+            <div style="border: 1px dashed #555; padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.02); text-align: center;">
+                <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 10px;">أو ضع رابط فيديو</p>
+                <input type="text" id="work-url" placeholder="https://..." 
+                       style="width: 100%; padding: 8px; border-radius: 5px; background: #000; border: 1px solid #444; color: white;">
+            </div>
+            
+        </div>
+
+        <button onclick="window.addNewWork()" 
+                style="width: 100%; padding: 15px; background: linear-gradient(45deg, #f5c518, #ffecb3); color: black; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s;">
+            🚀 نشر العمل الآن
+        </button>
+
+    </div>
         </div>
     </div>
 
