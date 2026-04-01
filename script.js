@@ -1,23 +1,23 @@
-// 1. استيراد المكتبات من CDN (تأكد من استخدام النسخة 10.7.1)
+// 1. استيراد المكتبات من CDN
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getDatabase, ref, set, onValue, remove, child, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// 2. إعدادات Firebase الخاصة بمشروعك
+// 2. إعدادات Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyD6ovMBiZrl2eVcMPwqGv-LWbo0T-504NY",
-  authDomain: "ahdynamics-63745.firebaseapp.com",
-  databaseURL: "https://ahdynamics-63745-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "ahdynamics-63745",
-  storageBucket: "ahdynamics-63745.firebasespot.app",
-  messagingSenderId: "153934340820",
-  appId: "1:153934340820:web:352caa101535b00b7dd141"
+    apiKey: "AIzaSyD6ovMBiZrl2eVcMPwqGv-LWbo0T-504NY",
+    authDomain: "ahdynamics-63745.firebaseapp.com",
+    databaseURL: "https://ahdynamics-63745-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "ahdynamics-63745",
+    storageBucket: "ahdynamics-63745.firebasespot.app",
+    messagingSenderId: "153934340820",
+    appId: "1:153934340820:web:352caa101535b00b7dd141"
 };
 
 // 3. تهيئة التطبيق
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// تهيئة AOS للأنيميشن
+// تهيئة AOS
 if (window.AOS) { AOS.init({ duration: 1000, once: false }); }
 
 const ADMIN_EMAIL = "ahabdellah210@gmail.com";
@@ -40,7 +40,6 @@ window.handleAuth = async function() {
     if (!email || pass.length < 6) return alert("يرجى إدخال بيانات صحيحة!");
 
     if (loginMode) {
-        // تسجيل دخول الأدمن أو المستخدم
         if (email === ADMIN_EMAIL && pass === ADMIN_PASS) {
             saveSession(emailKey);
             showAdminPanel();
@@ -54,7 +53,6 @@ window.handleAuth = async function() {
             });
         }
     } else {
-        // إنشاء حساب
         set(ref(db, 'users/' + emailKey), { email, pass }).then(() => {
             alert("تم التسجيل بنجاح!"); window.toggleAuthMode();
         });
@@ -68,7 +66,6 @@ function saveSession(key) {
 
 // --- نظام المعرض (Showroom) ---
 
-// 1. إضافة عمل جديد
 window.addNewWork = function() {
     const title = document.getElementById('work-title').value.trim();
     const category = document.getElementById('work-category').value;
@@ -84,6 +81,7 @@ window.addNewWork = function() {
                 alert("✅ تم النشر!");
                 document.getElementById('work-title').value = "";
                 document.getElementById('work-url').value = "";
+                document.getElementById('work-file-pc').value = "";
             });
     };
 
@@ -98,7 +96,6 @@ window.addNewWork = function() {
     }
 };
 
-// 2. عرض الفيديوهات للزوار
 window.listenToShowroom = function() {
     const grid = document.getElementById('showroom-grid');
     if (!grid) return;
@@ -122,26 +119,24 @@ window.listenToShowroom = function() {
     });
 };
 
-// 3. إدارة الحذف للأدمن
 function loadAdminWorksList() {
     const list = document.getElementById('admin-works-list');
     onValue(ref(db, 'showroom/'), (snapshot) => {
         if (!list) return;
         list.innerHTML = "";
         const data = snapshot.val();
-        if (!data) { list.innerHTML = "<p>لا توجد أعمال.</p>"; return; }
+        if (!data) { list.innerHTML = "<p style='color: #555; text-align: center;'>لا توجد أعمال منشورة.</p>"; return; }
 
         Object.keys(data).forEach(key => {
             const item = data[key];
             const row = document.createElement('div');
-            row.className = "admin-work-item";
             row.style = "display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.05); padding:12px; margin-bottom:10px; border-radius:10px; border:1px solid #333;";
             row.innerHTML = `
                 <div style="text-align:right;">
                     <span style="color:var(--gold); font-weight:bold;">${item.title}</span><br>
                     <small style="color:#666;">${item.category}</small>
                 </div>
-                <button onclick="window.deleteWork('${key}')" style="background:#ff4d4d; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;">حذف</button>
+                <button onclick="window.deleteWork('${key}')" style="background:#ff4d4d; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer; font-weight:bold;">حذف</button>
             `;
             list.appendChild(row);
         });
@@ -149,14 +144,15 @@ function loadAdminWorksList() {
 }
 
 window.deleteWork = function(key) {
-    if (confirm("هل أنت متأكد من حذف هذا الفيديو؟")) {
+    if (confirm("هل أنت متأكد من حذف هذا الفيديو نهائياً؟")) {
         remove(ref(db, 'showroom/' + key))
-            .then(() => alert("تم الحذف!"))
-            .catch(err => alert("خطأ: " + err.message));
+            .then(() => alert("تم الحذف بنجاح!"))
+            .catch(err => alert("خطأ في الحذف: " + err.message));
     }
 };
 
-// --- التحكم في الصفحات ---
+// --- التحكم في الصفحات ولوحة الإدارة ---
+
 function enterSite() {
     document.getElementById('auth-container').classList.add('hidden');
     document.getElementById('main-content').classList.remove('hidden');
@@ -164,22 +160,42 @@ function enterSite() {
 }
 
 function showAdminPanel() {
-    enterSite();
-    document.getElementById('admin-page').classList.remove('hidden');
+    enterSite(); 
+    const adminPage = document.getElementById('admin-page');
+    adminPage.classList.remove('hidden');
+
+    // إضافة زر خروج الأدمن الملون
+    if (!document.getElementById('admin-logout-btn')) {
+        const logoutBtn = document.createElement('button');
+        logoutBtn.id = 'admin-logout-btn';
+        logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> تسجيل خروج المسؤول';
+        logoutBtn.style = "background: #ff4d4d; color: white; margin: 20px auto; display: block; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; border: 1px solid rgba(255,255,255,0.2); transition: 0.3s;";
+        
+        logoutBtn.onclick = window.logout;
+        adminPage.prepend(logoutBtn);
+    }
+
     loadAdminWorksList();
 }
 
 window.logout = function() {
-    localStorage.removeItem('ah_user_session');
-    location.reload();
+    if(confirm("هل تريد تسجيل الخروج؟")) {
+        localStorage.removeItem('ah_user_session');
+        location.reload();
+    }
 };
 
-// تشغيل عند التحميل
+// --- بدء التشغيل والتحقق من الجلسة ---
 window.addEventListener('DOMContentLoaded', () => {
     const saved = localStorage.getItem('ah_user_session');
     if (saved) {
         currentUserEmail = saved;
-        if (saved === ADMIN_EMAIL.replace(/\./g, '_')) { showAdminPanel(); } 
-        else { enterSite(); }
+        const adminKey = ADMIN_EMAIL.replace(/\./g, '_');
+        
+        if (saved === adminKey) { 
+            showAdminPanel(); 
+        } else { 
+            enterSite(); 
+        }
     }
 });
